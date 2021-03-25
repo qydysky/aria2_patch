@@ -1,0 +1,33 @@
+diff --git a/src/download_helper.cc b/src/download_helper.cc
+index 6118aa14..8f0cad8b 100644
+--- a/src/download_helper.cc
++++ b/src/download_helper.cc
+@@ -36,6 +36,8 @@
+ 
+ #include <algorithm>
+ #include <sstream>
++#include <iostream>
++#include <fstream>
+ 
+ #include "RequestGroup.h"
+ #include "Option.h"
+@@ -558,10 +560,17 @@ std::shared_ptr<UriListParser> openUriListParser(const std::string& filename)
+   std::string listPath;
+ 
+   auto f = File(filename);
+-  if (!f.exists() || f.isDir()) {
++  if (f.isDir()) {
+     throw DL_ABORT_EX(fmt(EX_FILE_OPEN, filename.c_str(),
+-                          "File not found or it is a directory"));
++                          "File is a directory"));
+   }
++
++  if (!f.exists()) {
++    std::ofstream File;
++    File.open(filename);
++    File.close();
++  }
++
+   listPath = filename;
+ 
+   return std::make_shared<UriListParser>(listPath);
