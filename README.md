@@ -8,3 +8,7 @@
 
 - [tracker_fail_anytime.patch](tracker_fail_anytime.patch)  
 由[Aria2 改造Tracker逻辑 ](https://aheadsnail.github.io/2018/12/06/Aria2-%E6%94%B9%E9%80%A0Tracker%E9%80%BB%E8%BE%91/)一文，得出当aria2连接tracker后，将会不再询问其他tracker，这个patch不再调用成功时执行的函数，总是执行失败时的函数，从而一直轮询。但需注意设置轮询间隔，避免tracker返回过于频繁的拒绝响应。
+
+- [tracker_retry_wait.patch](tracker_retry_wait.patch)  
+tracker失败时会重试1次，此patch将重试间隔设为`--retry-wait=<SEC>`。
+

@@ -1,5 +1,5 @@
 diff --git a/src/TrackerWatcherCommand.cc b/src/TrackerWatcherCommand.cc
-index 960a377e..7e1938e2 100644
+index 960a377e..cc8edd19 100644
 --- a/src/TrackerWatcherCommand.cc
 +++ b/src/TrackerWatcherCommand.cc
 @@ -240,15 +240,11 @@ bool TrackerWatcherCommand::execute()
@@ -21,15 +21,3 @@ index 960a377e..7e1938e2 100644
        }
        trackerRequest_.reset();
      }
-@@ -372,9 +368,9 @@ TrackerWatcherCommand::createHTTPAnnRequest(const std::string& uri)
-     A2_LOG_DEBUG("This is single-tracker announce.");
-   }
-   rg->setNumConcurrentCommand(1);
--  // If backup tracker is available, try 2 times for each tracker
-+  // If backup tracker is available, try 1 times for each tracker
-   // and if they all fails, then try next one.
--  option->put(PREF_MAX_TRIES, "2");
-+  option->put(PREF_MAX_TRIES, "1");
-   // TODO When dry-run mode becomes available in BitTorrent, set
-   // PREF_DRY_RUN=false too.
-   option->put(PREF_USE_HEAD, A2_V_FALSE);

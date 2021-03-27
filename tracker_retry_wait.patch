@@ -1,0 +1,12 @@
+diff --git a/src/TrackerWatcherCommand.cc b/src/TrackerWatcherCommand.cc
+index 960a377e..21cb38c3 100644
+--- a/src/TrackerWatcherCommand.cc
++++ b/src/TrackerWatcherCommand.cc
+@@ -375,6 +375,7 @@ TrackerWatcherCommand::createHTTPAnnRequest(const std::string& uri)
+   // If backup tracker is available, try 2 times for each tracker
+   // and if they all fails, then try next one.
+   option->put(PREF_MAX_TRIES, "2");
++  option->put(PREF_RETRY_WAIT, option->get(PREF_RETRY_WAIT));
+   // TODO When dry-run mode becomes available in BitTorrent, set
+   // PREF_DRY_RUN=false too.
+   option->put(PREF_USE_HEAD, A2_V_FALSE);
