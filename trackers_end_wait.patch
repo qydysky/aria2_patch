@@ -1,0 +1,53 @@
+diff --git a/src/DefaultBtAnnounce.cc b/src/DefaultBtAnnounce.cc
+index 98d4ac0d..5b3c001c 100644
+--- a/src/DefaultBtAnnounce.cc
++++ b/src/DefaultBtAnnounce.cc
+@@ -78,11 +78,10 @@ DefaultBtAnnounce::~DefaultBtAnnounce() = default;
+ 
+ bool DefaultBtAnnounce::isDefaultAnnounceReady()
+ {
+-  return (trackers_ == 0 &&
+-          prevAnnounceTimer_.difference(global::wallclock()) >=
+-              (userDefinedInterval_.count() == 0 ? minInterval_
+-                                                 : userDefinedInterval_) &&
+-          !announceList_.allTiersFailed());
++  if (trackers_ != 0) {return false;}
++  if (!announceList_.allTiersFailed()) {return true;}
++  return (prevAnnounceTimer_.difference(global::wallclock()) >= 
++      (userDefinedInterval_.count() == 0 ? minInterval_ : userDefinedInterval_));
+ }
+ 
+ bool DefaultBtAnnounce::isStoppedAnnounceReady()
+diff --git a/src/TrackerWatcherCommand.cc b/src/TrackerWatcherCommand.cc
+index 960a377e..5074872a 100644
+--- a/src/TrackerWatcherCommand.cc
++++ b/src/TrackerWatcherCommand.cc
+@@ -240,15 +240,11 @@ bool TrackerWatcherCommand::execute()
+     // will get Segmentation fault.
+     if (trackerRequest_->success()) {
+       if (trackerRequest_->processResponse(btAnnounce_)) {
+-        btAnnounce_->announceSuccess();
+-        btAnnounce_->resetAnnounce();
+         addConnection();
+       }
+-      else {
+-        btAnnounce_->announceFailure();
+-        if (btAnnounce_->isAllAnnounceFailed()) {
+-          btAnnounce_->resetAnnounce();
+-        }
++      btAnnounce_->announceFailure();
++      if (btAnnounce_->isAllAnnounceFailed()) {
++        btAnnounce_->resetAnnounce();
+       }
+       trackerRequest_.reset();
+     }
+@@ -296,8 +292,7 @@ void TrackerWatcherCommand::addConnection()
+ std::unique_ptr<AnnRequest>
+ TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
+ {
+-  while (!btAnnounce_->isAllAnnounceFailed() &&
+-         btAnnounce_->isAnnounceReady()) {
++  while (btAnnounce_->isAnnounceReady()) {
+     std::string uri = btAnnounce_->getAnnounceUrl();
+     uri_split_result res;
+     memset(&res, 0, sizeof(res));
