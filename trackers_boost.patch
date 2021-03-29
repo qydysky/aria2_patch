@@ -1,0 +1,125 @@
+diff --git a/src/AnnounceList.cc b/src/AnnounceList.cc
+index c60dcda6..a5c01cf6 100644
+--- a/src/AnnounceList.cc
++++ b/src/AnnounceList.cc
+@@ -254,6 +254,16 @@ bool AnnounceList::allTiersFailed() const
+   return currentTier_ == std::end(tiers_);
+ }
+ 
++int AnnounceList::currentTierLoc() const
++{
++  int loc = 0;
++  for (auto tier = std::begin(tiers_);tier != std::end(tiers_);tier++) {
++    if (currentTier_ == tier) {return loc;}
++    loc++;
++  }
++  return -1;
++}
++
+ void AnnounceList::resetTier() { resetIterator(); }
+ 
+ bool AnnounceList::currentTierAcceptsStoppedEvent() const
+diff --git a/src/AnnounceList.h b/src/AnnounceList.h
+index dd4e8f7e..228f142e 100644
+--- a/src/AnnounceList.h
++++ b/src/AnnounceList.h
+@@ -129,6 +129,7 @@ public:
+   void moveToCompletedAllowedTier();
+ 
+   bool allTiersFailed() const;
++  int currentTierLoc() const;
+ 
+   void resetTier();
+ 
+diff --git a/src/DefaultBtAnnounce.cc b/src/DefaultBtAnnounce.cc
+index 98d4ac0d..9d70131c 100644
+--- a/src/DefaultBtAnnounce.cc
++++ b/src/DefaultBtAnnounce.cc
+@@ -78,11 +78,18 @@ DefaultBtAnnounce::~DefaultBtAnnounce() = default;
+ 
+ bool DefaultBtAnnounce::isDefaultAnnounceReady()
+ {
+-  return (trackers_ == 0 &&
+-          prevAnnounceTimer_.difference(global::wallclock()) >=
+-              (userDefinedInterval_.count() == 0 ? minInterval_
+-                                                 : userDefinedInterval_) &&
+-          !announceList_.allTiersFailed());
++  if (trackers_ != 0) {return false;}
++
++  if (announceList_.currentTierLoc() != 0) {return true;}
++
++  if (prevAnnounceTimer_.isZero()) {
++    A2_LOG_INFO("set prevAnnounceTimer_ to now");
++    prevAnnounceTimer_ = global::wallclock();
++    return false;
++  }
++
++  return (prevAnnounceTimer_.difference(global::wallclock()) >= 
++      (userDefinedInterval_.count() == 0 ? minInterval_ : userDefinedInterval_));
+ }
+ 
+ bool DefaultBtAnnounce::isStoppedAnnounceReady()
+diff --git a/src/OptionHandlerFactory.cc b/src/OptionHandlerFactory.cc
+index 6bff4caa..f0292a7b 100644
+--- a/src/OptionHandlerFactory.cc
++++ b/src/OptionHandlerFactory.cc
+@@ -1675,7 +1675,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+   {
+     OptionHandler* op(new NumberOptionHandler(PREF_BT_TRACKER_CONNECT_TIMEOUT,
+                                               TEXT_BT_TRACKER_CONNECT_TIMEOUT,
+-                                              "60", 1, 600));
++                                              "7", 1, 600));
+     op->addTag(TAG_BITTORRENT);
+     op->setInitialOption(true);
+     op->setChangeGlobalOption(true);
+@@ -1684,7 +1684,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+   }
+   {
+     OptionHandler* op(new NumberOptionHandler(
+-        PREF_BT_TRACKER_INTERVAL, TEXT_BT_TRACKER_INTERVAL, "0", 0));
++        PREF_BT_TRACKER_INTERVAL, TEXT_BT_TRACKER_INTERVAL, "60", 0));
+     op->addTag(TAG_BITTORRENT);
+     op->setInitialOption(true);
+     op->setChangeGlobalOption(true);
+@@ -1693,7 +1693,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+   }
+   {
+     OptionHandler* op(new NumberOptionHandler(
+-        PREF_BT_TRACKER_TIMEOUT, TEXT_BT_TRACKER_TIMEOUT, "60", 1, 600));
++        PREF_BT_TRACKER_TIMEOUT, TEXT_BT_TRACKER_TIMEOUT, "7", 1, 600));
+     op->addTag(TAG_BITTORRENT);
+     op->setInitialOption(true);
+     op->setChangeGlobalOption(true);
+diff --git a/src/TrackerWatcherCommand.cc b/src/TrackerWatcherCommand.cc
+index 960a377e..5074872a 100644
+--- a/src/TrackerWatcherCommand.cc
++++ b/src/TrackerWatcherCommand.cc
+@@ -240,15 +240,11 @@ bool TrackerWatcherCommand::execute()
+     // will get Segmentation fault.
+     if (trackerRequest_->success()) {
+       if (trackerRequest_->processResponse(btAnnounce_)) {
+-        btAnnounce_->announceSuccess();
+-        btAnnounce_->resetAnnounce();
+         addConnection();
+       }
+-      else {
+-        btAnnounce_->announceFailure();
+-        if (btAnnounce_->isAllAnnounceFailed()) {
+-          btAnnounce_->resetAnnounce();
+-        }
++      btAnnounce_->announceFailure();
++      if (btAnnounce_->isAllAnnounceFailed()) {
++        btAnnounce_->resetAnnounce();
+       }
+       trackerRequest_.reset();
+     }
+@@ -296,8 +292,7 @@ void TrackerWatcherCommand::addConnection()
+ std::unique_ptr<AnnRequest>
+ TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
+ {
+-  while (!btAnnounce_->isAllAnnounceFailed() &&
+-         btAnnounce_->isAnnounceReady()) {
++  while (btAnnounce_->isAnnounceReady()) {
+     std::string uri = btAnnounce_->getAnnounceUrl();
+     uri_split_result res;
+     memset(&res, 0, sizeof(res));
