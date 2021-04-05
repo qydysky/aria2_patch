@@ -32,10 +32,10 @@ index dd4e8f7e..228f142e 100644
    void resetTier();
  
 diff --git a/src/DefaultBtAnnounce.cc b/src/DefaultBtAnnounce.cc
-index 98d4ac0d..9d70131c 100644
+index 98d4ac0d..8134519c 100644
 --- a/src/DefaultBtAnnounce.cc
 +++ b/src/DefaultBtAnnounce.cc
-@@ -78,11 +78,18 @@ DefaultBtAnnounce::~DefaultBtAnnounce() = default;
+@@ -78,11 +78,17 @@ DefaultBtAnnounce::~DefaultBtAnnounce() = default;
  
  bool DefaultBtAnnounce::isDefaultAnnounceReady()
  {
@@ -54,8 +54,7 @@ index 98d4ac0d..9d70131c 100644
 +    return false;
 +  }
 +
-+  return (prevAnnounceTimer_.difference(global::wallclock()) >= 
-+      (userDefinedInterval_.count() == 0 ? minInterval_ : userDefinedInterval_));
++  return (prevAnnounceTimer_.difference(global::wallclock()) >= (userDefinedInterval_.count() == 0 ? minInterval_ : userDefinedInterval_));
  }
  
  bool DefaultBtAnnounce::isStoppedAnnounceReady()
