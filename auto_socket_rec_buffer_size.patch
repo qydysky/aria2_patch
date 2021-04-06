@@ -23,7 +23,7 @@ index c2249202..3695c570 100644
  }
  
 diff --git a/src/util.cc b/src/util.cc
-index 07502c0e..8c7ed2ed 100644
+index 07502c0e..80ce73be 100644
 --- a/src/util.cc
 +++ b/src/util.cc
 @@ -64,6 +64,7 @@
@@ -55,7 +55,7 @@ index 07502c0e..8c7ed2ed 100644
 +  if (MAX_CONCURRENT_DOWNLOADS == 0){MAX_CONCURRENT_DOWNLOADS = 1;}
 +  int want = option->getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT) / MAX_CONNECTION_PER_SERVER / MAX_CONCURRENT_DOWNLOADS;
 +  want = SocketBufferSize(option, want);
-+  if (want != -1 && want != option->getAsInt(PREF_SOCKET_RECV_BUFFER_SIZE)) {
++  if (want != option->getAsInt(PREF_SOCKET_RECV_BUFFER_SIZE)) {
 +    A2_LOG_NOTICE(fmt("Adjust SOCKET_RECV_BUFFER_SIZE to %d", want));
 +    option->put(PREF_SOCKET_RECV_BUFFER_SIZE,util::itos(want));
 +  }
