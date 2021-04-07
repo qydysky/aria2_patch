@@ -1,0 +1,13 @@
+diff --git a/src/OptionHandlerFactory.cc b/src/OptionHandlerFactory.cc
+index 6bff4caa..e8ce9314 100644
+--- a/src/OptionHandlerFactory.cc
++++ b/src/OptionHandlerFactory.cc
+@@ -702,7 +702,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+   {
+     OptionHandler* op(new UnitNumberOptionHandler(PREF_SOCKET_RECV_BUFFER_SIZE,
+                                                   TEXT_SOCKET_RECV_BUFFER_SIZE,
+-                                                  "0", 0, 16_m));
++                                                  "512k", 0, 16_m));
+     op->addTag(TAG_ADVANCED);
+     handlers.push_back(op);
+   }

@@ -12,5 +12,5 @@
 - [tracker_retry_wait.patch](tracker_retry_wait.patch)  
 tracker失败时会重试1次，此patch将重试间隔设为`--retry-wait=<SEC>`。
 
-- [auto_socket_rec_buffer_size.patch](auto_socket_rec_buffer_size.patch)  
-根据`max-overall-download-limit`，`max-concurrent-downloads`，`max-connections-per-server`自动调整`socket-recv-buffer-size`，变动范围在默认的`1-16M`之间。特别的，当`max-overall-download-limit`为0时，`socket-recv-buffer-size`为最大值。
+- [socket_rec_buffer_size.patch](socket_rec_buffer_size.patch)  
+设置`socket_rec_buffer_size=512k`。关于这个patch的详情见[aria2缓冲区](https://blog.ntsdtt.bid/2021/fa1c2979.html)
