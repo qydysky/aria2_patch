@@ -13,4 +13,4 @@
 tracker失败时会重试1次，此patch将重试间隔设为`--retry-wait=<SEC>`。
 
 - [socket_rec_buffer_size.patch](socket_rec_buffer_size.patch)  
-设置`socket_rec_buffer_size=512k`。关于这个patch的详情见[aria2缓冲区](https://blog.ntsdtt.bid/2021/fa1c2979.html)
+设置`socket_rec_buffer_size=512k`。关于这个patch的详情见[aria2缓冲区](https://blog.ntsdtt.bid/2021/41d62b99d1f0.html)
